@@ -8,7 +8,6 @@ with open('best_model_pipeline.pkl', 'rb') as file:
 st.title("Salary Predictor Model")
 st.write("Enter some details and get the salary prediction")
 
-# Input sliders and selectboxes
 age = st.slider("Age", min_value=17, max_value=75, step=1, value=17)
 educational_num = st.slider("Educational-num", min_value=1, max_value=16, step=1, value=1)
 workclass = st.selectbox(
