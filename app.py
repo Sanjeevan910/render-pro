@@ -2,7 +2,7 @@ import streamlit as st
 import pickle
 import pandas as pd
 
-with open('best_model_pipeline.pkl', 'rb') as file:
+with open('best_model_pipeline2.pkl', 'rb') as file:
     model = pickle.load(file)
 
 st.title("Salary Predictor Model")
