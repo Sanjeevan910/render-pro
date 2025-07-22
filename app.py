@@ -43,8 +43,6 @@ img_b64 = get_base64_image(IMG_PATH)
 css_content = load_css(CSS_PATH)
 js_content = load_js(JS_PATH)
 
-css_and_html_injection_method = st.html if hasattr(st, 'html') else st.markdown
-
 if img_b64:
     page_bg_img_style = f"""
     <style>
@@ -61,7 +59,10 @@ if img_b64:
     {js_content}
     </script>
     """
-    css_and_html_injection_method(page_bg_img_style, unsafe_allow_html=True)
+    if hasattr(st, 'html'):
+        st.html(page_bg_img_style)
+    else:
+        st.markdown(page_bg_img_style, unsafe_allow_html=True)
 else:
     st.warning("Background image not loaded. Using default styling.")
     fallback_css_and_scripts = f"""
@@ -72,7 +73,10 @@ else:
     {js_content}
     </script>
     """
-    css_and_html_injection_method(fallback_css_and_scripts, unsafe_allow_html=True)
+    if hasattr(st, 'html'):
+        st.html(fallback_css_and_scripts)
+    else:
+        st.markdown(fallback_css_and_scripts, unsafe_allow_html=True)
 
 @st.cache_resource
 def load_model():
