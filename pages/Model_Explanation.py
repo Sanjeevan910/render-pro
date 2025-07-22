@@ -77,13 +77,13 @@ st.markdown("---")
 
 st.subheader("Model Architecture")
 st.write("""
-    Our salary prediction model utilizes a **CatBoost Classifier**, known for its robust performance with categorical features and resistance to overfitting.
+    Our salary prediction model utilizes a CatBoost Classifier, known for its robust performance with categorical features and resistance to overfitting.
     The model is part of a scikit-learn pipeline, which handles data preprocessing steps before feeding the data into the CatBoost model.
 
     The pipeline typically includes:
-    * **One-Hot Encoding or Ordinal Encoding**: For converting categorical features (like 'Workclass', 'Occupation', 'Gender', etc.) into numerical representations that the model can understand.
-    * **Scaling**: Numerical features (like 'Age', 'Educational Years', 'Hours per Week', 'Capital Gain', 'Capital Loss', 'Fnlwgt') might be scaled (e.g., using StandardScaler or MinMaxScaler) to normalize their ranges, preventing features with larger values from dominating the learning process.
-    * **CatBoost Classifier**: The final estimator that learns patterns from the processed data to classify individuals into salary ranges (e.g., '>50K' or '<=50K').
+    * One-Hot Encoding or Ordinal Encoding: For converting categorical features (like 'Workclass', 'Occupation', 'Gender', etc.) into numerical representations that the model can understand.
+    * Scaling: Numerical features (like 'Age', 'Educational Years', 'Hours per Week', 'Capital Gain', 'Capital Loss', 'Fnlwgt') might be scaled (e.g., using StandardScaler or MinMaxScaler) to normalize their ranges, preventing features with larger values from dominating the learning process.
+    * CatBoost Classifier: The final estimator that learns patterns from the processed data to classify individuals into salary ranges (e.g., '>50K' or '<=50K').
 """)
 
 st.subheader("Training Data")
@@ -94,19 +94,19 @@ st.write("""
 st.subheader("Prediction Process")
 st.write("""
     When you input new employee information into the app, the following steps occur:
-    1.  **Data Collection**: Your inputs are collected into a pandas DataFrame.
-    2.  **Preprocessing**: This DataFrame is then passed through the pre-trained scikit-learn pipeline. The pipeline applies the same transformations (encoding, scaling) that were learned during the model's training phase.
-    3.  **Prediction**: The preprocessed data is fed into the CatBoost Classifier, which outputs the predicted salary range.
-    4.  **Display Result**: The predicted salary range is then displayed on the application's main page.
+    1.  Data Collection: Your inputs are collected into a pandas DataFrame.
+    2.  Preprocessing: This DataFrame is then passed through the pre-trained scikit-learn pipeline. The pipeline applies the same transformations (encoding, scaling) that were learned during the model's training phase.
+    3.  Prediction: The preprocessed data is fed into the CatBoost Classifier, which outputs the predicted salary range.
+    4.  Display Result: The predicted salary range is then displayed on the application's main page.
 """)
 
 st.subheader("Why CatBoost?")
 st.write("""
     CatBoost is chosen for several reasons:
-    * **Handles Categorical Features Natively**: It can process categorical features directly without requiring extensive preprocessing like one-hot encoding, though it works well within a pipeline that includes such steps.
-    * **Robust to Overfitting**: Uses ordered boosting, which helps in preventing overfitting, especially on noisy data.
-    * **Good Performance**: Often delivers state-of-the-art results on various datasets.
-    * **Gradient Boosting**: It's a gradient boosting algorithm, which builds models sequentially, with each new model correcting errors made by previous ones.
+    * Handles Categorical Features Natively: It can process categorical features directly without requiring extensive preprocessing like one-hot encoding, though it works well within a pipeline that includes such steps.
+    * Robust to Overfitting: Uses ordered boosting, which helps in preventing overfitting, especially on noisy data.
+    * Good Performance: Often delivers state-of-the-art results on various datasets.
+    * Gradient Boosting: It's a gradient boosting algorithm, which builds models sequentially, with each new model correcting errors made by previous ones.
 """)
 
 st.markdown("---")
