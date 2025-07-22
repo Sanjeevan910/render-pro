@@ -39,8 +39,6 @@ img_b64 = get_base64_image(IMG_PATH)
 css_content = load_css(CSS_PATH)
 js_content = load_js(JS_PATH)
 
-css_and_html_injection_method = st.html if hasattr(st, 'html') else st.markdown
-
 if img_b64:
     page_bg_img_and_scripts = f"""
     <style>
@@ -57,7 +55,10 @@ if img_b64:
     {js_content}
     </script>
     """
-    css_and_html_injection_method(page_bg_img_and_scripts, unsafe_allow_html=True)
+    if hasattr(st, 'html'):
+        st.html(page_bg_img_and_scripts)
+    else:
+        st.markdown(page_bg_img_and_scripts, unsafe_allow_html=True)
 else:
     st.warning("Background image not loaded for this page. Using default styling.")
     fallback_css_and_scripts = f"""
@@ -68,7 +69,10 @@ else:
     {js_content}
     </script>
     """
-    css_and_html_injection_method(fallback_css_and_scripts, unsafe_allow_html=True)
+    if hasattr(st, 'html'):
+        st.html(fallback_css_and_scripts)
+    else:
+        st.markdown(fallback_css_and_scripts, unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align: center; color: #FFD700;'>🧠 How the Model Works 🧠</h1>", unsafe_allow_html=True)
 st.markdown("<p class='explanation-text'>Dive into the mechanics of our salary prediction model.</p>", unsafe_allow_html=True)
