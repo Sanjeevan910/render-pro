@@ -5,7 +5,7 @@ import os
 PARENT_DIR = os.path.dirname(os.path.dirname(__file__))
 CSS_PATH = os.path.join(PARENT_DIR, "style.css")
 JS_PATH = os.path.join(PARENT_DIR, "script.js")
-IMG_PATH = os.path.join(PARENT_DIR, "background.jpg")
+IMG_PATH = os.path.join(PARENT_DIR, "background.jpeg")
 
 def get_base64_image(image_path):
     try:
@@ -63,6 +63,9 @@ else:
     st.warning("Background image not loaded for this page. Using default styling.")
     fallback_css_and_scripts = f"""
     <style>
+    .stApp {{
+        background-color: white;
+    }}
     {css_content}
     </style>
     <script type="text/javascript">
@@ -74,7 +77,7 @@ else:
     else:
         st.markdown(fallback_css_and_scripts, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #FFD700;'>📚 Attribute Explanation 📚</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #111111;'>📚 Attribute Explanation 📚</h1>", unsafe_allow_html=True)
 st.markdown("<p class='explanation-text'>Understanding the features used in the salary prediction model.</p>", unsafe_allow_html=True)
 
 st.markdown("---")
