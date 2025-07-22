@@ -14,7 +14,7 @@ st.set_page_config(
 BASE_DIR = os.path.dirname(__file__)
 CSS_PATH = os.path.join(BASE_DIR, "style.css")
 JS_PATH = os.path.join(BASE_DIR, "script.js")
-IMG_PATH = os.path.join(BASE_DIR, "background.jpg")
+IMG_PATH = os.path.join(BASE_DIR, "background.jpeg")
 MODEL_PATH = os.path.join(BASE_DIR, "best_model_pipeline2.pkl")
 
 def get_base64_image(image_path):
@@ -22,7 +22,7 @@ def get_base64_image(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
-        st.error(f"Error: Background image not found at {image_path}. Please ensure 'background.jpg' is in the same directory as 'app.py'.")
+        st.error(f"Error: Background image not found at {image_path}. Please ensure 'background.jpeg' is in the same directory as 'app.py'.")
         return None
 
 def load_css(file_name):
@@ -95,12 +95,10 @@ pipeline = load_model()
 if pipeline is None:
     st.stop()
 
-st.markdown("<h1 style='text-align: center; color: #FFD700;'>💰 Employee Salary Predictor 💰</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subheader-text'>Predicting salary based on various employee attributes.</p>", unsafe_allow_html=True)
-
+# CHANGE 1: Moved the buttons to the top-right corner
 st.markdown(
     """
-    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px;">
+    <div class="top-right-buttons">
         <a href="/Attribute_Explanation" target="_self" class="nav-button">
             Explain Attributes
         </a>
@@ -111,6 +109,9 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+st.markdown("<h1 style='text-align: center; color: #FFD700;'>💰 Employee Salary Predictor 💰</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subheader-text'>Predicting salary based on various employee attributes.</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -130,7 +131,7 @@ with col1:
         "Adm-clerical", "Sales", "Other-service", "Machine-op-inspct",
         "Transport-moving", "Handlers-cleaners", "Farming-fishing",
         "Tech-support", "Protective-serv", "Priv-house-serv",
-        "Armed-Forces", "Amer-Indian-Eskimo"
+        "Armed-Forces"
     ])
     gender = st.radio("Gender", ["Male", "Female"])
 
@@ -162,12 +163,14 @@ with col2:
     capital_loss = st.number_input("Capital Loss", min_value=0, max_value=100000, value=0, step=100)
     fnlwgt = st.number_input("Fnlwgt (Final Weight)", min_value=10000, max_value=1000000, value=150000, step=1000)
 
+# CHANGE 2: Centered the "Predict Salary Range" button
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
 if st.button("Predict Salary Range", key="predict_button"):
     input_data = pd.DataFrame([{
         'age': age,
         'workclass': workclass,
         'fnlwgt': fnlwgt,
-        'education-num': education_num,
+        'educational-num': education_num,
         'marital-status': marital_status,
         'occupation': occupation,
         'relationship': relationship,
@@ -183,14 +186,19 @@ if st.button("Predict Salary Range", key="predict_button"):
         prediction = pipeline.predict(input_data)[0]
 
         st.markdown("---")
-        st.markdown(
-            f"<h2 style='text-align: center; color: #4CAF50;'>Predicted Salary Range: <span style='color: #FFD700;'>{prediction}</span></h2>",
-            unsafe_allow_html=True
-        )
+        st.markdown("<h2 style='text-align: center; color: #111111;'>Predicted Salary Range</h2>", unsafe_allow_html=True)
+        
+        if prediction == 0:
+            st.markdown("<div style='text-align: center; font-size: 2em; color: #111111; font-weight: bold;'>&#60;=50K</div>", unsafe_allow_html=True)
+        else:
+            st.markdown("<div style='text-align: center; font-size: 2em; color: #111111; font-weight: bold;'>&#62;50K</div>", unsafe_allow_html=True)
+        
         st.balloons()
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
         st.info("Please check your input values and ensure the model is loaded correctly.")
+
+st.markdown("</div>", unsafe_allow_html=True) # Close the centered div
 
 st.markdown("---")
 
