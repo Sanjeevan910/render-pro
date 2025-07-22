@@ -1,282 +1,126 @@
 import streamlit as st
 import base64
+import os
 
-st.set_page_config(
-    page_title="Model Explanation",
-    page_icon="🧠",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+PARENT_DIR = os.path.dirname(os.path.dirname(__file__))
+CSS_PATH = os.path.join(PARENT_DIR, "style.css")
+JS_PATH = os.path.join(PARENT_DIR, "script.js")
+IMG_PATH = os.path.join(PARENT_DIR, "background.jpg")
 
 def get_base64_image(image_path):
     try:
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
-        st.warning(f"Image not found at {image_path}. Please ensure all image files are in the correct directory.")
         return None
 
-img_path = "background.jpg"
-img_b64 = get_base64_image(img_path)
+def load_css(file_name):
+    try:
+        with open(file_name, "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
+def load_js(file_name):
+    try:
+        with open(file_name, "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
+st.set_page_config(
+    page_title="How Model Works",
+    page_icon="🧠",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+img_b64 = get_base64_image(IMG_PATH)
+css_content = load_css(CSS_PATH)
+js_content = load_js(JS_PATH)
 
 css_and_html_injection_method = st.html if hasattr(st, 'html') else st.markdown
 
-page_bg_img = f"""
-<style>
-.stApp {{
-    background-image: url("data:image/jpeg;base64,{img_b64}") ;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}}
-.stApp::before {{
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-}}
-
-body, p, .stMarkdown, .stText, .stButton > button, label,
-h1, h3, h4, h5, h6, li
-{{
-    color: white !important;
-}}
-
-h2 {{
-    color: white !important;
-    font-weight: bold !important;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
-}}
-
-label[data-testid*="stWidgetLabel"] p {{
-    color: #FFD700 !important;
-    font-weight: bold !important;
-    font-size: 1.1em !important;
-}}
-
-.content-container {{
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}}
-
-.section-title {{
-    font-weight: bold;
-    color: #FFD700;
-    font-size: 1.3em;
-    margin-top: 20px;
-    margin-bottom: 10px;
-}}
-
-.section-text {{
-    color: white;
-    font-size: 1em;
-    line-height: 1.5;
-    margin-bottom: 15px;
-}}
-
-.stImage > img {{
-    border-radius: 8px;
-    border: 2px solid #FFD700;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    margin-top: 20px;
-    margin-bottom: 20px;
-}}
-
-.stButton>button {{
-    background-color: #FFD700;
-    color: black !important;
-    border-radius: 8px;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.1em;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease-in-out;
-}}
-.stButton>button:hover {{
-    background-color: #FFC000;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}}
-
-.footer {{
-    position: relative;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: rgba(0,0,0,0.5);
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    font-size: 12px;
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}}
-
-.social-icons {{
-    margin-top: 10px;
-    display: flex;
-    gap: 15px;
-}}
-
-.social-icon-link {{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background-color: #FFD700;
-    text-decoration: none;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}}
-
-.social-icon-link:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}}
-
-.social-icon-svg {{
-    fill: black;
-    width: 20px;
-    height: 20px;
-}}
-</style>
-"""
-
 if img_b64:
-    css_and_html_injection_method(page_bg_img)
-else:
-    st.warning("Background image 'background.jpg' not found. App will use default dark background.")
-    fallback_css = """
+    page_bg_img_and_scripts = f"""
     <style>
-    .stApp {{ background-color: #2F3645; }}
-    body, p, .stMarkdown, .stText, .stButton > button, label, h1, h3, h4, h5, h6, li {{ color: white !important; }}
-    h2 {{ color: white !important; font-weight: bold !important; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); }}
-    label[data-testid*="stWidgetLabel"] p {{ color: #FFD700 !important; font-weight: bold !important; font-size: 1.1em !important; }}
-    .content-container {{ background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; margin-top: 20px; border: 1px solid rgba(255, 255, 255, 0.3); }}
-    .section-title {{ font-weight: bold; color: #FFD700; font-size: 1.3em; margin-top: 20px; margin-bottom: 10px; }}
-    .section-text {{ color: white; font-size: 1em; line-height: 1.5; margin-bottom: 15px; }}
-    .stImage > img {{ border-radius: 8px; border: 2px solid #FFD700; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); margin-top: 20px; margin-bottom: 20px; }}
-    .stButton>button {{ background-color: #FFD700; color: black !important; }}
-    .stButton>button:hover {{ background-color: #FFC000; }}
-    .footer {{ position: relative; width: 100%; background-color: rgba(0,0,0,0.5); color: white; text-align: center; padding: 15px 0; margin-top: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; }}
-    .social-icons {{ margin-top: 10px; display: flex; gap: 15px; }}
-    .social-icon-link {{ display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 50%; background-color: #FFD700; text-decoration: none; }}
-    .social-icon-link svg {{ fill: black; width: 20px; height: 20px; }}
+    .stApp {{
+        background-image: url("data:image/jpeg;base64,{img_b64}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    {css_content}
     </style>
+    <script type="text/javascript">
+    {js_content}
+    </script>
     """
-    css_and_html_injection_method(fallback_css)
+    css_and_html_injection_method(page_bg_img_and_scripts, unsafe_allow_html=True)
+else:
+    st.warning("Background image not loaded for this page. Using default styling.")
+    fallback_css_and_scripts = f"""
+    <style>
+    {css_content}
+    </style>
+    <script type="text/javascript">
+    {js_content}
+    </script>
+    """
+    css_and_html_injection_method(fallback_css_and_scripts, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #FFD700;'>🧠 Our Model: Behind the Scenes 🧠</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: white;'>Discover the journey of building our Salary Prediction Model, step by step.</p>", unsafe_allow_html=True)
-
-st.markdown("---")
-
-st.markdown('<div class="content-container">', unsafe_allow_html=True)
-st.markdown('<h3 class="section-title">1. Data Collection & Initial Preprocessing</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        Our journey began with loading and preparing the Adult dataset. This crucial first step involved several processes:
-        <ul>
-            <li>Handling potential parsing errors during data loading.</li>
-            <li>Explicitly converting numerical columns to ensure correct data types.</li>
-            <li>Identifying and managing missing values, which are common in real-world datasets.</li>
-            <li>Dropping the 'education' column as its numerical representation ('educational-num') was already present and more suitable for direct modeling.</li>
-            <li>Finally, we split the data into training and testing sets, carefully preserving the original features to ensure consistency with our subsequent preprocessing pipeline.</li>
-        </ul>
-    </p>
-""", unsafe_allow_html=True)
-
-st.image("employee salary presentation slide 2.png", caption="Count of Missing Values per Column", use_column_width=True)
-
-st.markdown('<h3 class="section-title">2. Data Preprocessing Pipeline</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        To maintain consistency and automate data transformations, we defined a robust preprocessing pipeline using Scikit-learn's <code>ColumnTransformer</code>. This pipeline automatically handles the one-hot encoding of our categorical features, converting them into a numerical format that machine learning models can understand. This automation is vital for consistent preprocessing when making predictions on new, unseen data, ensuring that the exact same transformations are applied as during training.
-    </p>
-""", unsafe_allow_html=True)
-
-st.markdown('<h3 class="section-title">3. Initial Model Training & Evaluation</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        With our data prepared, we proceeded to train and evaluate several initial machine learning models. Each model was integrated within our preprocessing pipeline to ensure fair comparison and proper data handling. This step helped us gauge the baseline performance of different algorithms on our dataset.
-    </p>
-""", unsafe_allow_html=True)
-st.image("employee salary presentation slide 3.png", caption="Initial Model F1-score Comparison", use_column_width=True)
-
-st.markdown('<h3 class="section-title">4. Hyperparameter Tuning</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        To significantly improve model performance, we embarked on hyperparameter tuning. We focused on the Random Forest and Gradient Boosting models, utilizing techniques like <code>GridSearchCV</code> and <code>RandomizedSearchCV</code>. This process systematically explores different combinations of hyperparameters to find the optimal settings that yield the best performance metrics, preventing overfitting and enhancing generalization.
-    </p>
-""", unsafe_allow_html=True)
-
-st.markdown('<h3 class="section-title">5. Ensemble Model & Final Evaluation</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        Our final step in model selection involved building and evaluating an Ensemble Model. This powerful approach combines the predictions of our best-tuned Random Forest and Gradient Boosting pipelines using a <code>Voting Classifier</code>. Ensembling often leads to more robust and accurate predictions by leveraging the strengths of individual models and mitigating their weaknesses.
-    </p>
-    <p class="section-text">
-        Based on our comprehensive evaluation, particularly focusing on the F1-score (which balances Precision and Recall), the <b>Ensemble Model</b> demonstrated the best overall performance on the unseen test set. While our target accuracy was 90%, the Ensemble Model achieved approximately <b>87.69% Accuracy</b>, proving to be a strong predictive capability for income based on the available features.
-    </p>
-    <p class="section-text">
-        Here are the key metrics for our best-performing Ensemble Model:
-        <ul>
-            <li><b>Accuracy:</b> 0.8769</li>
-            <li><b>Precision:</b> 0.7777</li>
-            <li><b>Recall:</b> 0.6646</li>
-            <li><b>F1-score:</b> 0.7167</li>
-        </ul>
-    </p>
-""", unsafe_allow_html=True)
-st.image("employee salary presentation slide 6,7.png", caption="Comparison of Model Performance Metrics", use_column_width=True)
-st.image("employee salary presentation slide 4.png", caption="Comparison of Model Performance (F1-score)", use_column_width=True)
-
-st.markdown('<h3 class="section-title">6. Feature Importance</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        Understanding which features contribute most to the model's predictions is crucial. We analyzed the feature importances from our tuned Gradient Boosting model to identify the most influential attributes in predicting income. This insight helps in interpreting the model and can guide future data collection or feature engineering efforts.
-    </p>
-""", unsafe_allow_html=True)
-st.image("employee salary presentation slide 5.png", caption="Top 20 Feature Importances from Tuned Gradient Boosting Model", use_column_width=True)
-
-st.markdown('<h3 class="section-title">7. Model Deployment & Output Mechanism</h3>', unsafe_allow_html=True)
-st.markdown("""
-    <p class="section-text">
-        For seamless deployment and usability, we saved the entire <b>Ensemble Model Pipeline</b> using Python's <code>pickle</code> module to <code>best_model_pipeline.pkl</code>. This pickled object encapsulates all the preprocessing steps and the trained model.
-    </p>
-    <p class="section-text">
-        When a user enters new data into the predictor interface, the following happens:
-        <ol>
-            <li>The new input features are received.</li>
-            <li>These raw features are passed directly into the loaded <code>best_model_pipeline.pkl</code>.</li>
-            <li>The pipeline automatically applies all the necessary preprocessing steps (like one-hot encoding for categorical features) that were learned during training.</li>
-            <li>Finally, the preprocessed data is fed into the trained Ensemble Model within the pipeline, which then makes a prediction: either <b>'>50K'</b> (indicating an annual income greater than 50,000 USD) or <b>'<=50K'</b> (indicating an annual income less than or equal to 50,000 USD).</li>
-        </ol>
-        This ensures that new data is transformed and predicted upon in exactly the same way as the training data, leading to consistent and reliable predictions.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FFD700;'>🧠 How the Model Works 🧠</h1>", unsafe_allow_html=True)
+st.markdown("<p class='explanation-text'>Dive into the mechanics of our salary prediction model.</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-col_back1, col_back2, col_back3 = st.columns([1,2,1])
-with col_back2:
-    if st.button("⬅️ Back to Predictor"):
-        st.switch_page("app.py")
+st.subheader("Model Architecture")
+st.write("""
+    Our salary prediction model utilizes a **CatBoost Classifier**, known for its robust performance with categorical features and resistance to overfitting.
+    The model is part of a scikit-learn pipeline, which handles data preprocessing steps before feeding the data into the CatBoost model.
+
+    The pipeline typically includes:
+    * **One-Hot Encoding or Ordinal Encoding**: For converting categorical features (like 'Workclass', 'Occupation', 'Gender', etc.) into numerical representations that the model can understand.
+    * **Scaling**: Numerical features (like 'Age', 'Educational Years', 'Hours per Week', 'Capital Gain', 'Capital Loss', 'Fnlwgt') might be scaled (e.g., using StandardScaler or MinMaxScaler) to normalize their ranges, preventing features with larger values from dominating the learning process.
+    * **CatBoost Classifier**: The final estimator that learns patterns from the processed data to classify individuals into salary ranges (e.g., '>50K' or '<=50K').
+""")
+
+st.subheader("Training Data")
+st.write("""
+    The model was trained on a comprehensive dataset containing various demographic and employment-related attributes of individuals, along with their corresponding salary ranges. The quality and diversity of the training data are crucial for the model's accuracy.
+""")
+
+st.subheader("Prediction Process")
+st.write("""
+    When you input new employee information into the app, the following steps occur:
+    1.  **Data Collection**: Your inputs are collected into a pandas DataFrame.
+    2.  **Preprocessing**: This DataFrame is then passed through the pre-trained scikit-learn pipeline. The pipeline applies the same transformations (encoding, scaling) that were learned during the model's training phase.
+    3.  **Prediction**: The preprocessed data is fed into the CatBoost Classifier, which outputs the predicted salary range.
+    4.  **Display Result**: The predicted salary range is then displayed on the application's main page.
+""")
+
+st.subheader("Why CatBoost?")
+st.write("""
+    CatBoost is chosen for several reasons:
+    * **Handles Categorical Features Natively**: It can process categorical features directly without requiring extensive preprocessing like one-hot encoding, though it works well within a pipeline that includes such steps.
+    * **Robust to Overfitting**: Uses ordered boosting, which helps in preventing overfitting, especially on noisy data.
+    * **Good Performance**: Often delivers state-of-the-art results on various datasets.
+    * **Gradient Boosting**: It's a gradient boosting algorithm, which builds models sequentially, with each new model correcting errors made by previous ones.
+""")
+
+st.markdown("---")
+
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/" target="_self" class="explanation-button">
+            Go Back to Predictor
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown(f"""
 <div class="footer">
