@@ -5,7 +5,7 @@ import os
 PARENT_DIR = os.path.dirname(os.path.dirname(__file__))
 CSS_PATH = os.path.join(PARENT_DIR, "style.css")
 JS_PATH = os.path.join(PARENT_DIR, "script.js")
-IMG_PATH = os.path.join(PARENT_DIR, "background.jpg")
+IMG_PATH = os.path.join(PARENT_DIR, "background.jpeg")
 
 def get_base64_image(image_path):
     try:
@@ -63,6 +63,9 @@ else:
     st.warning("Background image not loaded for this page. Using default styling.")
     fallback_css_and_scripts = f"""
     <style>
+    .stApp {{
+        background-color: white;
+    }}
     {css_content}
     </style>
     <script type="text/javascript">
@@ -74,43 +77,56 @@ else:
     else:
         st.markdown(fallback_css_and_scripts, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #FFD700;'>🧠 How the Model Works 🧠</h1>", unsafe_allow_html=True)
-st.markdown("<p class='explanation-text'>Dive into the mechanics of our salary prediction model.</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #111111;'>🧠 How the Model Works 🧠</h1>", unsafe_allow_html=True)
+st.markdown("<p class='explanation-text'>A step-by-step guide to our salary prediction model.</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-st.subheader("Model Architecture")
+st.subheader("1. Data Collection and Preprocessing")
 st.write("""
-    Our salary prediction model utilizes a CatBoost Classifier, known for its robust performance with categorical features and resistance to overfitting.
-    The model is part of a scikit-learn pipeline, which handles data preprocessing steps before feeding the data into the CatBoost model.
-
-    The pipeline typically includes:
-    * One-Hot Encoding or Ordinal Encoding: For converting categorical features (like 'Workclass', 'Occupation', 'Gender', etc.) into numerical representations that the model can understand.
-    * Scaling: Numerical features (like 'Age', 'Educational Years', 'Hours per Week', 'Capital Gain', 'Capital Loss', 'Fnlwgt') might be scaled (e.g., using StandardScaler or MinMaxScaler) to normalize their ranges, preventing features with larger values from dominating the learning process.
-    * CatBoost Classifier: The final estimator that learns patterns from the processed data to classify individuals into salary ranges (e.g., '>50K' or '<=50K').
+    The first step involved collecting and preparing the raw data. This included:
+    * Handling potential parsing errors and explicitly converting data types.
+    * Addressing missing values.
+    * Dropping irrelevant columns, such as 'education', as we used 'educational-num' instead.
+    
+    A preprocessing pipeline with a `ColumnTransformer` was then defined to automatically handle the one-hot encoding of categorical features. This ensures consistency for both training and future predictions.
 """)
+try:
+    st.image(os.path.join(PARENT_DIR, "employee salary presentation slide 2.png"), caption="Initial Data Distribution", use_column_width=True)
+    st.image(os.path.join(PARENT_DIR, "employee salary presentation slide 3.png"), caption="Categorical Feature Breakdown", use_column_width=True)
+except Exception as e:
+    st.error(f"Error loading initial data images: {e}. Please ensure the files are in the correct directory.")
 
-st.subheader("Training Data")
+st.markdown("---")
+
+st.subheader("2. Model Training and Evaluation")
 st.write("""
-    The model was trained on a comprehensive dataset containing various demographic and employment-related attributes of individuals, along with their corresponding salary ranges. The quality and diversity of the training data are crucial for the model's accuracy.
+    We trained and evaluated several initial machine learning models. To further improve their performance, we performed hyperparameter tuning on the **Random Forest** and **Gradient Boosting** models using advanced search techniques (`GridSearchCV` and `RandomizedSearchCV`).
 """)
+try:
+    st.image(os.path.join(PARENT_DIR, "employee salary presentation slide 4.png"), caption="Initial Model Performance Comparison", use_column_width=True)
+except Exception as e:
+    st.error(f"Error loading model performance image: {e}. Please ensure the file is in the correct directory.")
 
-st.subheader("Prediction Process")
+st.markdown("---")
+
+st.subheader("3. The Final Ensemble Model")
 st.write("""
-    When you input new employee information into the app, the following steps occur:
-    1.  Data Collection: Your inputs are collected into a pandas DataFrame.
-    2.  Preprocessing: This DataFrame is then passed through the pre-trained scikit-learn pipeline. The pipeline applies the same transformations (encoding, scaling) that were learned during the model's training phase.
-    3.  Prediction: The preprocessed data is fed into the CatBoost Classifier, which outputs the predicted salary range.
-    4.  Display Result: The predicted salary range is then displayed on the application's main page.
+    To achieve the best possible performance, we built an **Ensemble Model**. This model combines the best-tuned versions of our Random Forest and Gradient Boosting pipelines using a `Voting Classifier`. This approach leverages the strengths of both models to make a more robust prediction.
+
+    Based on the evaluation, this Ensemble Model demonstrated the best overall performance, with strong metrics particularly in F1-score.
 """)
+try:
+    st.image(os.path.join(PARENT_DIR, "employee salary presentation slide 5.png"), caption="Ensemble Model Performance Metrics", use_column_width=True)
+    st.image(os.path.join(PARENT_DIR, "employee salary presentation slide 6,7.png"), caption="Feature Importance and Confusion Matrix", use_column_width=True)
+except Exception as e:
+    st.error(f"Error loading Ensemble Model images: {e}. Please ensure the files are in the correct directory.")
 
-st.subheader("Why CatBoost?")
+st.markdown("---")
+
+st.subheader("4. Deployment")
 st.write("""
-    CatBoost is chosen for several reasons:
-    * Handles Categorical Features Natively: It can process categorical features directly without requiring extensive preprocessing like one-hot encoding, though it works well within a pipeline that includes such steps.
-    * Robust to Overfitting: Uses ordered boosting, which helps in preventing overfitting, especially on noisy data.
-    * Good Performance: Often delivers state-of-the-art results on various datasets.
-    * Gradient Boosting: It's a gradient boosting algorithm, which builds models sequentially, with each new model correcting errors made by previous ones.
+    For deployment, we saved the entire **Ensemble Model Pipeline** as a single pickle file (`best_model_pipeline.pkl`). This allows the application to load the entire pipeline, including all preprocessing steps, ensuring that new data is handled identically to the training data for consistent and reliable predictions.
 """)
 
 st.markdown("---")
